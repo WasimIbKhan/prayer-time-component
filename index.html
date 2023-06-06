@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Prayer Times</title>
+  <style type="text/css">
+    .salah-block-content {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f0f0f0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .salah-times {
+      margin-top: 10px;
+    }
+
+    .salah-time-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+    }
+
+    .salah-time-row span {
+      flex: 1;
+      text-align: center;
+    }
+
+    .calendar-link a {
+      text-decoration: none;
+      color: #333;
+    }
+  </style>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      fetch('Kentish Town_timetable_2023.csv')
+        .then(response => response.text())
+        .then(data => processCSV(data));
+    });
+
+    function processCSV(csvData) {
+      const rows = csvData.split('\n').slice(2); // Skip the first two header rows
+
+      rows.forEach(row => {
+        const columns = row.split('\t');
+	console.log(columns)
+        const date = columns[1];
+        const fajrBegins = columns[4];
+        const fajrJamah = columns[5];
+        const zuhrBegins = columns[6];
+        const zuhrJamah = columns[7];
+        const asrBegins = columns[8];
+        const asrJamah = columns[9];
+        const maghribBegins = columns[10];
+        const maghribJamah = columns[11];
+        const ishaBegins = columns[12];
+        const ishaJamah = columns[13];
+
+        const salahTimeRow = document.createElement('div');
+        salahTimeRow.className = 'salah-time-row';
+        salahTimeRow.innerHTML = `
+          <span class="col2">${date}</span>
+          <span class="col3 col-s">Fajr</span>
+          <span class="col4 col-s">Zuhr</span>
+          <span class="col5 col-s">'Asr</span>
+          <span class="col6 col-s">Maghrib</span>
+          <span class="col7 col-s">'Ishā</span>
+        `;
+
+        const timeStartRow = document.createElement('div');
+        timeStartRow.className = 'salah-time-row time-start';
+        timeStartRow.innerHTML = `
+          <span class="col2">Begins</span>
+          <span class="col3 pi1 col-s fajr">${fajrBegins}</span>
+          <span class="col4 pi2 col-s zuhr">${zuhrBegins}</span>
+          <span class="col5 pi3 col-s asr">${asrBegins}</span>
+          <span class="col6 pi4 col-s maghrib">${maghribBegins}</span>
+          <span class="col7 col-s isha">${ishaBegins}</span>
+        `;
+
+        const timeJamahRow = document.createElement('div');
+        timeJamahRow.className = 'salah-time-row time-end';
+        timeJamahRow.innerHTML = `
+          <span class="col2">Jamā‘ah</span>
+          <span class="col3 col-s fajr">${fajrJamah}</span>
+          <span class="col4 pi7 col-s zuhr">${zuhrJamah}</span>
+          <span class="col5 col-s asr">${asrJamah}</span>
+          <span class="col6 col-s maghrib">${maghribJamah}</span>
+          <span class="col7 col-s isha">${ishaJamah}</span>
+        `;
+
+        const salahTimesContainer = document.querySelector('.salah-times');
+        salahTimesContainer.appendChild(salahTimeRow);
+        salahTimesContainer.appendChild(timeStartRow);
+        salahTimesContainer.appendChild(timeJamahRow);
+      });
+    }
+  </script>
+</head>
+
+<body>
+  <div class="salah-block-content mceNonEditable">
+    <div class="calendar-link">
+      <a href="/prayer-times">Full Timetable &amp; Calendar</a>
+    </div>
+    <div class="salah-times">
+      <!-- The prayer time rows will be dynamically generated here -->
+    </div>
+  </div>
+</body>
+</html>
