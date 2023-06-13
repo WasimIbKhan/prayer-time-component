@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Prayer Times</title>
   <style type="text/css">
@@ -34,67 +35,96 @@
   </style>
   <script>
     window.addEventListener('DOMContentLoaded', () => {
-      fetch('Kentish Town_timetable_2023.csv')
+      fetch('https://ca99b793-202c-49c6-be0d-d1b997fdf7d4.usrfiles.com/ugd/ca99b7_6e3884bc9f5d4dc0b25700664ff6c0d8.csv')
         .then(response => response.text())
         .then(data => processCSV(data));
     });
 
+    // Function to get the ordinal suffix for the day
+    function getOrdinalSuffix(day) {
+      const suffixes = ["th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th"];
+      if (day >= 11 && day <= 13) {
+        return "th";
+      }
+      return suffixes[day % 10] || "th";
+    }
+
+    // Array of month names
+    const monthNames = [
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ];
+
     function processCSV(csvData) {
-      const rows = csvData.split('\n').slice(2); // Skip the first two header rows
+      const today = new Date();
+      const formattedDate = `${today.getDate()} ${monthNames[today.getMonth()]}`;
+      const rows = csvData.split('\n');
+      const headerRow = rows[0].split(',');
+      let todayRow = null;
 
-      rows.forEach(row => {
-        const columns = row.split('\t');
-	console.log(columns)
-        const date = columns[1];
-        const fajrBegins = columns[4];
-        const fajrJamah = columns[5];
-        const zuhrBegins = columns[6];
-        const zuhrJamah = columns[7];
-        const asrBegins = columns[8];
-        const asrJamah = columns[9];
-        const maghribBegins = columns[10];
-        const maghribJamah = columns[11];
-        const ishaBegins = columns[12];
-        const ishaJamah = columns[13];
+      // Find the row with the matching date
+      for (let i = 1; i < rows.length; i++) {
+        const row = rows[i].split(',');
+        const date = row[5]; // Assuming date is stored in column 5
+        if (date === formattedDate) {
+          todayRow = row;
+          break;
+        }
+      }
 
-        const salahTimeRow = document.createElement('div');
-        salahTimeRow.className = 'salah-time-row';
-        salahTimeRow.innerHTML = `
-          <span class="col2">${date}</span>
-          <span class="col3 col-s">Fajr</span>
-          <span class="col4 col-s">Zuhr</span>
-          <span class="col5 col-s">'Asr</span>
-          <span class="col6 col-s">Maghrib</span>
-          <span class="col7 col-s">'Ishā</span>
-        `;
+      const dateIndex = headerRow.indexOf("Date");
+      const beginsIndex = headerRow.indexOf("Begins");
+      const jamahIndex = headerRow.indexOf("Jamā‘ah");
 
-        const timeStartRow = document.createElement('div');
-        timeStartRow.className = 'salah-time-row time-start';
-        timeStartRow.innerHTML = `
-          <span class="col2">Begins</span>
-          <span class="col3 pi1 col-s fajr">${fajrBegins}</span>
-          <span class="col4 pi2 col-s zuhr">${zuhrBegins}</span>
-          <span class="col5 pi3 col-s asr">${asrBegins}</span>
-          <span class="col6 pi4 col-s maghrib">${maghribBegins}</span>
-          <span class="col7 col-s isha">${ishaBegins}</span>
-        `;
+      const todayDate = todayRow[5];
+      const fajrBegins = todayRow[6];
+      const fajrJamah = todayRow[7];
+      const zuhrBegins = todayRow[8];
+      const zuhrJamah = todayRow[9];
+      const asrBegins = todayRow[10];
+      const asrJamah = todayRow[11];
+      const maghribBegins = todayRow[12];
+      const maghribJamah = todayRow[13];
+      const ishaBegins = todayRow[14];
+      const ishaJamah = todayRow[15];
 
-        const timeJamahRow = document.createElement('div');
-        timeJamahRow.className = 'salah-time-row time-end';
-        timeJamahRow.innerHTML = `
-          <span class="col2">Jamā‘ah</span>
-          <span class="col3 col-s fajr">${fajrJamah}</span>
-          <span class="col4 pi7 col-s zuhr">${zuhrJamah}</span>
-          <span class="col5 col-s asr">${asrJamah}</span>
-          <span class="col6 col-s maghrib">${maghribJamah}</span>
-          <span class="col7 col-s isha">${ishaJamah}</span>
-        `;
+      const salahTimeRow = document.createElement('div');
+      salahTimeRow.className = 'salah-time-row';
+      salahTimeRow.innerHTML = `
+        <span class="col2">${todayDate}</span>
+        <span class="col3 col-s">Fajr</span>
+        <span class="col4 col-s">Zuhr</span>
+        <span class="col5 col-s">'Asr</span>
+        <span class="col6 col-s">Maghrib</span>
+        <span class="col7 col-s">'Ishā</span>
+      `;
 
-        const salahTimesContainer = document.querySelector('.salah-times');
-        salahTimesContainer.appendChild(salahTimeRow);
-        salahTimesContainer.appendChild(timeStartRow);
-        salahTimesContainer.appendChild(timeJamahRow);
-      });
+      const timeStartRow = document.createElement('div');
+      timeStartRow.className = 'salah-time-row time-start';
+      timeStartRow.innerHTML = `
+        <span class="col2">Begins</span>
+        <span class="col3 pi1 col-s fajr">${fajrBegins}</span>
+        <span class="col4 pi2 col-s zuhr">${zuhrBegins}</span>
+        <span class="col5 pi3 col-s asr">${asrBegins}</span>
+        <span class="col6 pi4 col-s maghrib">${maghribBegins}</span>
+        <span class="col7 col-s isha">${ishaBegins}</span>
+      `;
+
+      const timeJamahRow = document.createElement('div');
+      timeJamahRow.className = 'salah-time-row time-end';
+      timeJamahRow.innerHTML = `
+        <span class="col2">Jamā‘ah</span>
+        <span class="col3 col-s fajr">${fajrJamah}</span>
+        <span class="col4 pi7 col-s zuhr">${zuhrJamah}</span>
+        <span class="col5 col-s asr">${asrJamah}</span>
+        <span class="col6 col-s maghrib">${maghribJamah}</span>
+        <span class="col7 col-s isha">${ishaJamah}</span>
+      `;
+
+      const salahTimesContainer = document.querySelector('.salah-times');
+      salahTimesContainer.appendChild(salahTimeRow);
+      salahTimesContainer.appendChild(timeStartRow);
+      salahTimesContainer.appendChild(timeJamahRow);
     }
   </script>
 </head>
@@ -109,4 +139,5 @@
     </div>
   </div>
 </body>
+
 </html>
